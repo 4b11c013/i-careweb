@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Care - 居家鼻胃管舒餵照護系統</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@300;500;700&family=Oswald:wght@500;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           1. 基礎設定 (明亮醫療專業風格)
+           ========================================= */
+        :root {
+            /* --- 您的指定配色 --- */
+            --bg-body: #FFFFFF;       /* 主背景：純白 */
+            --bg-secondary: #F7F7F7;  /* 副背景/卡片底：淺灰 */
+            --primary: #1C2E4A;       /* 主按鈕/重點色：深海軍藍 */
+            --text-main: #333333;     /* 主要文字：深灰 */
+            
+            --text-light: #666666;    /* 次要文字 */
+            --accent: #2B59FF;        /* 輔助亮藍 (用於小裝飾) */
+            --hotspot-red: #00c8ff;   /* 熱點青色 (維持警示感) */
+            
+            --border: #e0e0e0;
+            --shadow: 0 10px 30px rgba(28, 46, 74, 0.08); /* 柔和的深藍陰影 */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Rajdhani', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        ul { list-style: none; }
+        a { text-decoration: none; transition: 0.3s; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* 進場動畫 */
+        .reveal { opacity: 0; transform: translateY(40px); transition: 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* 通用標題樣式 (深色漸層) */
+        .section-header { text-align: center; margin-bottom: 60px; position: relative; }
+        .section-header h2 {
+            font-family: 'Oswald', sans-serif; font-size: 3rem; margin-bottom: 10px; display: inline-block;
+            /* 改為深色漸層以適應白底 */
+            background: linear-gradient(to right, var(--primary), #4a6fa5);
+            background-clip: text; -webkit-background-clip: text; color: transparent;
+        }
+        .section-header p {
+            color: var(--text-light); font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; font-weight: 600;
+        }
+
+        /* 主按鈕樣式 */
+        .btn-primary {
+            display: inline-block; padding: 15px 40px;
+            background-color: var(--primary); color: white;
+            border-radius: 50px; font-weight: 600; letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(28, 46, 74, 0.2);
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(28, 46, 74, 0.3);
+            background-color: #2a4369;
+        }
+
+        /* =========================================
+           2. 導航列 (白底陰影)
+           ========================================= */
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 20px 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95); /* 白底半透明 */
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .brand-name {
+            font-family: 'Oswald', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 2px;
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .brand-name:hover {
+            color: var(--primary);
+            opacity: 0.8;
+        }
+        .nav-menu { display: flex; justify-content: space-evenly; width: 1400px; position: absolute; left: 55%; transform: translateX(-50%); }
+        .nav-menu a {
+            color: var(--text-main); font-size: 1rem; font-weight: 500; letter-spacing: 1px; padding: 5px 0; position: relative;
+            display: inline-block; z-index: 1;
+        }
+        .nav-menu a:hover { color: var(--primary); }
+        .nav-menu a::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 2px; background: var(--primary); transition: 0.3s;
+            z-index: -1;
+        }
+        .nav-menu a:hover::after { width: 100%; }
+
+        /* =========================================
+           3. Hero Section (滿版輪播)
+           ========================================= */
+        #hero {
+            position: relative; width: 100%; height: 100vh; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .background-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1.5s ease-in-out;
+        }
+        .slide.active { opacity: 1; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* 遮罩：改為淺色遮罩或微暗遮罩，讓白字清楚，但因為現在風格是白底，Hero 圖如果是深色，文字維持白色 */
+        /* 這裡我們維持 Hero 文字為白色，因為背景通常是圖片，比較容易閱讀 */
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 100%);
+            z-index: 1; pointer-events: none;
+        }
+
+        .hero-content-wrapper { position: absolute; bottom: 25%; left: 10%; z-index: 10; text-align: left; }
+        .slide-caption h2 {
+            font-family: 'Oswald', sans-serif; font-size: 5rem; color: white; line-height: 1; margin-bottom: 15px;
+            opacity: 0; transform: translateY(30px); transition: 0.8s ease;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .slide-caption p {
+            color: #fff; font-size: 1.5rem; letter-spacing: 3px; font-weight: 500;
+            border-left: 4px solid var(--primary); padding-left: 15px; display: inline-block;
+            background: rgba(28, 46, 74, 0.6); /* 增加背景色塊確保可讀性 */
+            backdrop-filter: blur(5px);
+            opacity: 0; transform: translateY(30px); transition: 0.8s ease 0.2s;
+        }
+        .slide.active .slide-caption h2, .slide.active .slide-caption p { opacity: 1; transform: translateY(0); }
+
+        .scroll-down {
+            position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%);
+            color: white; font-size: 0.8rem; letter-spacing: 2px;
+            animation: bounce 2s infinite; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 20;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .arrow { width: 10px; height: 10px; border-right: 1px solid white; border-bottom: 1px solid white; transform: rotate(45deg); }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
+            40% {transform: translateX(-50%) translateY(-10px);}
+            60% {transform: translateX(-50%) translateY(-5px);}
+        }
+
+        /* 底部圓弧 - 改為白色填充 */
+        .hero-bottom-curve {
+            position: absolute; bottom: -1px; left: 0; width: 100%; height: 120px; z-index: 50; pointer-events: none;
+        }
+        .curve-fill { fill: var(--bg-body); stroke: none; } /* 填滿白色 */
+        .curve-stroke { fill: none; stroke: var(--primary); stroke-width: 2; opacity: 0.5; }
+
+        /* =========================================
+           4. 系統四大亮點 (Interactive Cart)
+           ========================================= */
+        #features {
+            position: relative; background-color: var(--bg-body); padding: 80px 0 120px 0; overflow: hidden;
+        }
+        .feature-stage { display: flex; justify-content: center; position: relative; perspective: 1000px; }
+        .cart-wrapper { position: relative; width: 550px; max-width: 100%; }
+        /* 圖片增加一點陰影讓它在白底上浮起來 */
+        .main-cart-img { width: 100%; display: block; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2)); }
+
+        .hotspot {
+            position: absolute; width: 40px; height: 40px; z-index: 10; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .dot {
+            width: 12px; height: 12px; background-color: var(--hotspot-red); border-radius: 50%;
+            box-shadow: 0 0 10px var(--hotspot-red); z-index: 2; transition: 0.4s;
+        }
+        .dot-ring {
+            position: absolute; width: 100%; height: 100%; border: 1px solid var(--hotspot-red);
+            border-radius: 50%; opacity: 0; animation: ripple 2s infinite;
+        }
+        @keyframes ripple { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        /* 卡片樣式 (改為淺灰底、深色字) */
+        .feature-card {
+            position: absolute; width: 280px; opacity: 0; visibility: hidden;
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); pointer-events: none; z-index: 100;
+        }
+        .feature-card .line {
+            height: 1px; background: var(--primary); width: 0; transition: width 0.3s 0.1s; margin-bottom: 10px; position: relative;
+        }
+        .feature-card .line::after {
+            content: ''; position: absolute; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; top: -1.5px;
+        }
+        .feature-card .content {
+            background: var(--bg-secondary); /* 淺灰底 #F7F7F7 */
+            border: 1px solid var(--border);
+            padding: 20px; border-radius: 8px; transform: translateY(10px); transition: transform 0.4s;
+            box-shadow: var(--shadow);
+        }
+        .feature-card h3 {
+            color: var(--primary); font-size: 1.1rem; margin-bottom: 8px; font-family: 'Oswald', sans-serif;
+            letter-spacing: 1px; border-left: 3px solid var(--hotspot-red); padding-left: 10px;
+        }
+        .feature-card p { color: var(--text-light); font-size: 0.95rem; line-height: 1.5; }
+
+        .feature-card.left { right: 40px; top: -20px; text-align: right; }
+        .feature-card.left .line { margin-left: auto; }
+        .feature-card.left .line::after { right: 0; }
+        .feature-card.right { left: 40px; top: -20px; text-align: left; }
+        .feature-card.right .line::after { left: 0; }
+
+        .hotspot:hover .dot { transform: scale(1.5); background: var(--primary); box-shadow: 0 0 0 transparent; }
+        .hotspot:hover .feature-card { opacity: 1; visibility: visible; }
+        .hotspot:hover .feature-card .line { width: 60px; }
+        .hotspot:hover .feature-card .content { transform: translateY(0); }
+
+        /* =========================================
+           5. 成果展示區 (滑動展開 - 淺色版)
+           ========================================= */
+        #outcomes {
+            background-color: var(--bg-secondary); /* 淺灰背景 #F7F7F7 */
+            padding: 100px 0; border-top: 1px solid var(--border);
+        }
+        .outcome-wrapper {
+            display: grid; grid-template-columns: 1fr 2fr; gap: 50px; align-items: center; height: 500px;
+        }
+        .outcome-text { position: relative; height: 100%; display: flex; align-items: center; }
+        .text-group {
+            position: absolute; top: 50%; left: 0; transform: translateY(-50%);
+            opacity: 0; visibility: hidden; transition: 0.5s ease; width: 100%;
+        }
+        .text-group.active { opacity: 1; visibility: visible; transform: translateY(-50%) translateX(0); }
+        .text-group h3 {
+            font-family: 'Oswald', sans-serif; font-size: 2rem; color: var(--primary); margin-bottom: 20px; letter-spacing: 1px;
+        }
+        .text-group p {
+            color: var(--text-main); font-size: 1rem; line-height: 1.8; border-left: 3px solid var(--primary); padding-left: 20px;
+        }
+
+        .outcome-gallery { display: flex; height: 100%; gap: 10px; overflow: hidden; border-radius: 20px; box-shadow: var(--shadow); }
+        .gallery-item {
+            position: relative; flex: 1; overflow: hidden; cursor: pointer;
+            transition: flex 0.5s cubic-bezier(0.25, 1, 0.5, 1); filter: grayscale(100%);
+        }
+        .gallery-item img {
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.5s;
+        }
+        .gallery-item .label {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            font-family: 'Oswald', sans-serif; font-size: 1.5rem; color: #fff; z-index: 10; transition: 0.3s;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .gallery-item .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--item-color); opacity: 0.6; mix-blend-mode: multiply; transition: 0.3s;
+        }
+        .gallery-item.active, .gallery-item:hover { flex: 4; filter: grayscale(0%); }
+        .gallery-item.active img, .gallery-item:hover img { opacity: 1; transform: scale(1.05); }
+        .gallery-item.active .label { opacity: 0; }
+
+        /* =========================================
+           6. 流程與 FAQ
+           ========================================= */
+        #process { background: var(--bg-body); padding: 100px 0; }
+        .process-container { display: grid; grid-template-columns: 250px 1fr; gap: 50px; }
+        .step-btn {
+            display: block; width: 100%; text-align: left; padding: 18px 25px;
+            background: white; border: 1px solid var(--border); border-radius: 8px;
+            color: var(--text-light); margin-bottom: 10px; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .step-btn.active, .step-btn:hover {
+            border-color: var(--primary); color: white; background: var(--primary);
+            padding-left: 30px; box-shadow: 0 5px 15px rgba(28, 46, 74, 0.2);
+        }
+        .pane { display: none; color: var(--text-main); }
+        .pane.active { display: block; animation: fadeIn 0.5s ease; }
+        .pane h3 { color: var(--primary); font-size: 2rem; margin-bottom: 20px; font-family: 'Oswald', sans-serif; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* FAQ Accordion */
+        #faq { background: var(--bg-secondary); padding: 100px 0; }
+        .acc-item { border-bottom: 1px solid var(--border); background: white; margin-bottom: 10px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .acc-btn {
+            width: 100%; padding: 20px 30px; background: transparent; border: none; text-align: left;
+            font-size: 1.1rem; font-weight: 500; cursor: pointer; color: var(--text-main); display: flex; justify-content: space-between;
+        }
+        .acc-btn:hover { color: var(--primary); }
+        .acc-content { max-height: 0; overflow: hidden; transition: 0.4s ease; color: var(--text-light); padding: 0 30px; background: #fafafa; }
+        .acc-item.active .acc-content { max-height: 150px; padding-bottom: 20px; }
+        .acc-item.active .icon-plus { transform: rotate(45deg); color: var(--primary); }
+        .icon-plus { transition: 0.3s; font-size: 1.5rem; }
+
+        footer { background: var(--primary); padding: 50px 0; text-align: center; color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+
+        /* RWD 手機版 */
+        @media (max-width: 768px) {
+            nav { padding: 20px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            .nav-menu { display: none; }
+            .brand-name { font-size: 1.5rem; }
+            .slide-caption h2 { font-size: 3rem; }
+            .hero-content-wrapper { left: 20px; bottom: 25%; }
+            .hero-bottom-curve { height: 60px; }
+            
+            .cart-wrapper { width: 90%; }
+            .feature-card { width: 220px; top: 40px !important; left: 50% !important; transform: translateX(-50%); text-align: center !important; }
+            .feature-card .line { display: none; }
+            
+            .outcome-wrapper { grid-template-columns: 1fr; height: auto; }
+            .outcome-text { min-height: 150px; text-align: center; }
+            .outcome-gallery { flex-direction: column; }
+            .gallery-item { height: 60px; } .gallery-item.active { height: 250px; }
+            
+            .process-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="brand-name">I CARE.</a>
+        <div class="nav-menu">
+            <a href="product.html">產品細節</a>
+            <a href="interface.html">介面內容</a>
+            <a href="reason.html">成立原因</a>
+            <a href="team.html">團隊介紹</a>
+        </div>
+    </nav>
+
+    <section id="hero">
+        <div class="background-slider">
+            <div class="slide active">
+                <img src="在醫院.jpg" alt="在醫院">
+                <div class="hero-content-wrapper">
+                    <div class="slide-caption">
+                        <h2>Comfort NG Tube Feeding System</h2>
+                        <p>整合式鼻胃管照護舒餵系統</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="開櫃子.jpg" alt="開櫃子">
+                <div class="hero-content-wrapper">
+                    <div class="slide-caption">
+                        <h2>Safe Feeding</h2>
+                        <p>安全、清晰的餵食流程引導</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="握手.jpg" alt="握手">
+                <div class="hero-content-wrapper">
+                    <div class="slide-caption">
+                        <h2>Precision Care</h2>
+                        <p>降低風險、提升照護品質</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="收東西.jpg" alt="收東西">
+                <div class="hero-content-wrapper">
+                    <div class="slide-caption">
+                        <h2>Designed for Home Care</h2>
+                        <p>居家也能擁有專業級照護</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-overlay"></div>
+        
+        <div class="scroll-down">
+            SCROLL <div class="arrow"></div>
+        </div>
+
+        <svg class="hero-bottom-curve" viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path class="curve-fill" d="M -50,10 Q 720,150 1490,10 L 1490,130 L -50,130 Z" />
+            <path class="curve-stroke" d="M -50,10 Q 720,150 1490,10" fill="none" />
+        </svg>
+    </section>
+
+    <section id="features">
+        <div class="container">
+            <div class="section-header reveal">
+                <p>SYSTEM HIGHLIGHTS</p>
+                <h2>系統四大亮點</h2>
+            </div>
+            <div class="feature-stage reveal">
+                <div class="cart-wrapper">
+                    <img src="cart.png" onerror="this.src='https://placehold.co/600x800/eee/999?text=Product+Image';" alt="Medical Cart" class="main-cart-img">
+
+                    <div class="hotspot" style="top: 22%; left: 28%;">
+                        <div class="dot-ring"></div><div class="dot"></div>
+                        <div class="feature-card left">
+                            <div class="line"></div>
+                            <div class="content"><h3>01. 整合式互動引導</h3><p>整合五步驟流程式指引，減輕新手不安，確保步驟正確。</p></div>
+                        </div>
+                    </div>
+                    <div class="hotspot" style="top: 26%; left: 62%;">
+                        <div class="dot-ring"></div><div class="dot"></div>
+                        <div class="feature-card right">
+                            <div class="line"></div>
+                            <div class="content"><h3>02. 重新定義動線</h3><p>穩固的空針卡槽設計，操作更精準輕鬆，無需手忙腳亂。</p></div>
+                        </div>
+                    </div>
+                    <div class="hotspot" style="top: 48%; left: 55%;">
+                        <div class="dot-ring"></div><div class="dot"></div>
+                        <div class="feature-card right">
+                            <div class="line"></div>
+                            <div class="content"><h3>03. 分層一體收納</h3><p>消毒、準備、收納三區分層，工具固定避免翻倒，符合垂直動線慣性。</p></div>
+                        </div>
+                    </div>
+                    <div class="hotspot" style="bottom: 14%; right: 35%;">
+                        <div class="dot-ring"></div><div class="dot"></div>
+                        <div class="feature-card right">
+                            <div class="line"></div>
+                            <div class="content"><h3>04. 穩固安全底盤</h3><p>防傾倒配重設計，並具備靜音輪，適合居家狹小空間移動。</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="outcomes">
+        <div class="container">
+            <div class="section-header reveal">
+                <p>DESIGN OUTCOMES</p>
+                <h2>設計成果展示</h2>
+            </div>
+            <div class="outcome-wrapper reveal">
+                <div class="outcome-text">
+                    <div class="text-group active" id="text-1">
+                        <h3>01. 產品渲染 Rendering</h3>
+                        <p>透過高擬真渲染，模擬真實材質與光影，展現醫療級產品的潔淨感與科技美學。</p>
+                    </div>
+                    <div class="text-group" id="text-2">
+                        <h3>02. 結構爆炸圖 Exploded</h3>
+                        <p>精密的內部結構設計，展示一體式收納、升降機構與配重底盤的機械原理。</p>
+                    </div>
+                    <div class="text-group" id="text-3">
+                        <h3>03. 介面設計 UI/UX</h3>
+                        <p>專為照護者設計的深色模式介面，低光環境不刺眼，大按鈕與直觀流程。</p>
+                    </div>
+                    <div class="text-group" id="text-4">
+                        <h3>04. 草圖發想 Sketch</h3>
+                        <p>透過多階段草圖推進，逐步確認方向並收斂出最終設計。</p>
+                    </div>
+                </div>
+                <div class="outcome-gallery">
+                    <div class="gallery-item active" data-target="text-1" style="--item-color: #D4D700;">
+                        <div class="overlay"></div>
+                        <img src="推車.jpg" alt="Rendering"><span class="label">01</span>
+                    </div>
+                    <div class="gallery-item" data-target="text-2" style="--item-color: #A020F0;">
+                        <div class="overlay"></div>
+                        <img src="https://placehold.co/400x600/A020F0/fff?text=Structure" alt="Structure"><span class="label">02</span>
+                    </div>
+                    <div class="gallery-item" data-target="text-3" style="--item-color: #2B59FF;">
+                        <div class="overlay"></div>
+                        <img src="https://placehold.co/400x600/2B59FF/fff?text=UI+Design" alt="UI Design"><span class="label">03</span>
+                    </div>
+                    <div class="gallery-item" data-target="text-4" style="--item-color: #4CAF50;">
+                        <div class="overlay"></div>
+                        <img src="草圖.jpg" alt="Sketch"><span class="label">04</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>I Care — 居家鼻胃管舒餵照護系統</p>
+            <p>&copy; 2025 Graduation Project. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 1. Hero 輪播
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 5000);
+
+        // 2. 成果展示區互動 (Sliding Outcomes)
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const textGroups = document.querySelectorAll('.text-group');
+        galleryItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                galleryItems.forEach(i => i.classList.remove('active'));
+                textGroups.forEach(t => t.classList.remove('active'));
+                item.classList.add('active');
+                const targetId = item.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // 3. 滾動出現動畫
+        window.addEventListener('scroll', () => {
+            document.querySelectorAll('.reveal').forEach(el => {
+                if(el.getBoundingClientRect().top < window.innerHeight - 100) {
+                    el.classList.add('active');
+                }
+            });
+        });
+        window.dispatchEvent(new Event('scroll'));
+    </script>
+
+</body>
+</html>
