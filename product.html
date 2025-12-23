@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>產品細節 - I Care 居家鼻胃管舒餵照護系統</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@300;500;700&family=Oswald:wght@500;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           1. 基礎設定
+           ========================================= */
+        :root {
+            --bg-body: #FFFFFF;
+            --bg-secondary: #F7F7F7;
+            --primary: #1C2E4A;
+            --text-main: #333333;
+            --text-light: #666666;
+            --accent: #2B59FF;
+            --hotspot-red: #ff4d4d;
+            --border: #e0e0e0;
+            --shadow: 0 10px 30px rgba(28, 46, 74, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Rajdhani', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; transition: 0.3s; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* 進場動畫 */
+        .reveal { opacity: 0; transform: translateY(30px); transition: 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* 標題樣式 */
+        .section-header { text-align: center; margin-bottom: 60px; position: relative; z-index: 2; }
+        .section-header h2 {
+            font-family: 'Oswald', sans-serif; font-size: 3rem; margin-bottom: 10px; display: inline-block;
+            background: linear-gradient(to right, var(--primary), #4a6fa5);
+            background-clip: text; -webkit-background-clip: text; color: transparent;
+        }
+        .section-header p {
+            color: var(--text-light); font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; font-weight: 600;
+        }
+
+        /* 導航列 */
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 20px 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .brand-name {
+            font-family: 'Oswald', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 2px;
+            color: var(--primary);
+        }
+        .nav-menu { display: flex; justify-content: space-evenly; width: 1400px; position: absolute; left: 55%; transform: translateX(-50%); }
+        .nav-menu a {
+            color: var(--text-main); font-size: 1rem; font-weight: 500; letter-spacing: 1px; padding: 5px 0; position: relative;
+        }
+        .nav-menu a:hover, .nav-menu a.active { color: var(--primary); }
+        .nav-menu a::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 2px; background: var(--primary); transition: 0.3s;
+        }
+        .nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; }
+        
+        .btn-primary {
+            display: inline-block; padding: 10px 30px;
+            background-color: var(--primary); color: white;
+            border-radius: 50px; font-weight: 600; letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(28, 46, 74, 0.2);
+        }
+        .btn-primary:hover { background-color: #2a4369; transform: translateY(-2px); }
+
+        /* 頁面標題區 */
+        .page-hero {
+            padding: 180px 0 80px 0;
+            background: var(--bg-secondary);
+            text-align: center;
+        }
+
+        /* =========================================
+           4. 圖文交錯展示區 (Zig-Zag) - 互動增強版
+           ========================================= */
+        .detail-section { padding: 100px 0; background: var(--bg-body); overflow: hidden; }
+        
+        .detail-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+            margin-bottom: 150px; position: relative;
+        }
+        .detail-row:last-child { margin-bottom: 0; }
+
+        /* --- 視差背景大數字 (Parallax Number) --- */
+        .bg-number {
+            position: absolute;
+            font-family: 'Oswald', sans-serif;
+            font-size: 15rem; /* 超大數字 */
+            font-weight: 700;
+            color: rgba(28, 46, 74, 0.1); /* 調整透明度，讓數字更明顯 */
+            z-index: 0;
+            line-height: 1;
+            top: -50px;
+            transition: transform 0.1s linear; /* 平滑捲動 */
+        }
+        /* 數字位置微調 */
+        .detail-row .bg-number { left: -50px; }
+        .detail-row.reverse .bg-number { left: auto; right: -50px; }
+        /* 01、02 位置更高 */
+        .detail-row:first-of-type .bg-number,
+        .detail-row:nth-of-type(2) .bg-number {
+            top: -100px; /* 比預設的 -50px 更高 */
+        }
+
+        /* 偶數行反轉 */
+        .detail-row.reverse .text-box { order: 1; }
+        .detail-row.reverse .img-box-wrapper { order: 2; }
+
+        /* --- 3D Tilt 圖片容器 --- */
+        .img-box-wrapper {
+            position: relative; z-index: 1;
+            perspective: 1000px; /* 3D 透視深度 */
+        }
+
+        .img-box { 
+            position: relative; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: var(--shadow); 
+            background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 400px;
+            
+            /* 3D 變形過渡 */
+            transform-style: preserve-3d;
+            transform: rotateX(0deg) rotateY(0deg);
+            transition: transform 0.1s ease-out; /* 跟隨滑鼠的反應速度 */
+        }
+
+        .img-box img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            transform: translateZ(20px); /* 讓圖片稍微浮起來 */
+        }
+
+        /* 圖片上的光澤 (Shine Effect) */
+        .shine {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0; z-index: 10; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        /* --- 文字區 --- */
+        .text-box { position: relative; z-index: 1; }
+        .text-box h3 {
+            font-family: 'Oswald', sans-serif; font-size: 2rem; color: var(--primary);
+            margin-bottom: 20px; position: relative; padding-left: 20px;
+        }
+        .text-box h3::before {
+            content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 4px;
+            background: var(--hotspot-red); border-radius: 4px;
+            transition: height 0.3s;
+        }
+        /* Hover 文字標題時，紅線變長 */
+        .detail-row:hover .text-box h3::before { height: 100%; top: 0; bottom: 0; }
+
+        .text-box p { font-size: 1.1rem; color: var(--text-light); line-height: 1.8; text-align: justify; }
+
+        /* Footer */
+        footer { background: var(--primary); padding: 50px 0; text-align: center; color: rgba(255,255,255,0.8); }
+
+        /* RWD */
+        @media (max-width: 768px) {
+            nav { padding: 20px; } .nav-menu { display: none; }
+            .detail-row { grid-template-columns: 1fr; gap: 40px; margin-bottom: 80px; }
+            .detail-row.reverse .text-box { order: 2; }
+            .detail-row.reverse .img-box-wrapper { order: 1; }
+            .bg-number { font-size: 8rem; top: 0; opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="brand-name">I CARE.</a>
+        <div class="nav-menu">
+            <a href="product.html" class="active">產品細節</a>
+            <a href="interface.html">介面內容</a>
+            <a href="reason.html">成立原因</a>
+            <a href="team.html">團隊介紹</a>
+        </div>
+    </nav>
+
+    <header class="page-hero">
+        <div class="container reveal active">
+            <div class="section-header" style="margin-bottom: 0;">
+                <p>PRODUCT DETAILS</p>
+                <h2>產品細節介紹</h2>
+            </div>
+        </div>
+    </header>
+
+    <section class="detail-section">
+        <div class="container">
+            
+            <div class="detail-row reveal">
+                <div class="bg-number" data-speed="0.1">01</div>
+                
+                <div class="img-box-wrapper">
+                    <div class="img-box tilt-card">
+                        <div class="shine"></div>
+                        <img src="兩個屌.png" onerror="this.src='https://placehold.co/600x500/eee/999?text=Product+Image+1';" alt="收納細節">
+                    </div>
+                </div>
+                <div class="text-box">
+                    <h3>可調式轉軸機構</h3>
+                    <p>採用多段式轉軸結構，使各功能臂可自由旋轉與固定，提升操作靈活度。轉軸具高穩定性，能在不同角度下維持支撐強度，改善傳統照護設備在使用時的受力不均問題。</p>
+                </div>
+            </div>
+
+            <div class="detail-row reverse reveal">
+                <div class="bg-number" data-speed="0.1">02</div>
+
+                <div class="img-box-wrapper">
+                    <div class="img-box tilt-card">
+                        <div class="shine"></div>
+                        <img src="昇屁眼.png" onerror="this.src='https://placehold.co/600x500/eee/999?text=Product+Image+2';" alt="固定結構">
+                    </div>
+                </div>
+                <div class="text-box">
+                    <h3>前向拉取機構——鼻胃管架專用拉環</h3>
+                    <p>拉環以簡化動線為核心，可直接將鼻胃管架從停放位置快速拉出至操作區域。此結構縮短取用距離，提高照護者的操作反應速度，特別適用於居家狹小空間的照護情境。</p>
+                </div>
+            </div>
+
+            <div class="detail-row reveal">
+                <div class="bg-number" data-speed="0.1">03</div>
+
+                <div class="img-box-wrapper">
+                    <div class="img-box tilt-card">
+                        <div class="shine"></div>
+                        <img src="昇睪丸.png" onerror="this.src='https://placehold.co/600x500/eee/999?text=Product+Image+3';" alt="人體工學">
+                    </div>
+                </div>
+                <div class="text-box">
+                    <h3>多軸調整的平板支臂</h3>
+                    <p>平板支臂採多軸結構，可前後、左右及傾角調整，以提升使用彈性。照護者可依當下動線快速定位，維持穩定視角，減少操作中頻繁調整姿勢的負擔。</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>I Care — 居家鼻胃管舒餵照護系統</p>
+            <p>&copy; 2025 Graduation Project. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 1. 捲動出現動畫
+        window.addEventListener('scroll', () => {
+            document.querySelectorAll('.reveal').forEach(el => {
+                if(el.getBoundingClientRect().top < window.innerHeight - 100) {
+                    el.classList.add('active');
+                }
+            });
+        });
+        window.dispatchEvent(new Event('scroll'));
+
+        // 2. 視差背景數字 (Parallax Numbers)
+        window.addEventListener('scroll', () => {
+            const numbers = document.querySelectorAll('.bg-number');
+            numbers.forEach(num => {
+                const speed = num.getAttribute('data-speed');
+                const yPos = -(window.scrollY * speed);
+                // 讓數字隨著捲動微微移動
+                num.style.transform = `translateY(${yPos}px)`;
+            });
+        });
+
+        // 3. 圖片 3D Tilt 互動效果 (JS 計算角度)
+        const cards = document.querySelectorAll('.tilt-card');
+
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // 計算中心點位移
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -10; // 上下翻轉幅度 (負號反轉)
+                const rotateY = ((x - centerX) / centerX) * 10;  // 左右翻轉幅度
+
+                // 應用變形
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+                
+                // 光澤移動
+                const shine = card.querySelector('.shine');
+                shine.style.opacity = '1';
+                shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3), transparent)`;
+            });
+
+            // 滑鼠離開時復原
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `rotateX(0) rotateY(0) scale(1)`;
+                card.querySelector('.shine').style.opacity = '0';
+            });
+        });
+    </script>
+
+</body>
+</html>
